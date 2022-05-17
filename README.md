@@ -13,8 +13,8 @@ if you want to upload files:
             dirname: build/dir
             bucketname: my-bucket
             s3dirname: selectel-folder
-            SELECTEL_KEY_ID: ${{ secrets.AWS_KEY_ID }}
-            SELECTEL_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+            AWS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
+            AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
 ```
 
 if you want to download files:
@@ -29,8 +29,8 @@ if you want to download files:
             bucketname: my-bucket
             s3dirname: selectel-folder
             DOWNLOAD: true
-            SELECTEL_KEY_ID: ${{ secrets.AWS_KEY_ID }}
-            SELECTEL_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+            AWS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
+            AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
 ```
 
 if you want to download a sinlge file:
