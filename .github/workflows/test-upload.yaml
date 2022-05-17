@@ -1,0 +1,54 @@
+name: Upload TEST
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: write run-id
+        run: |
+          mkdir lab
+          echo ${{ github.run_id }} >> ./lab/run-id.txt
+
+      # UPload test
+      - name: Sync with AWS (Upload)
+        uses: Zebrainy/s3-sync-action@main
+        with:
+          dirname: lab
+          bucketname: aws-internal
+          s3dirname: lab-test
+          AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          REGION: us-east-2
+
+      # Download test
+      - name: Sync with AWS (Down)
+        uses: Zebrainy/s3-sync-action@main
+        with:
+          dirname: download
+          bucketname: aws-internal
+          s3dirname: lab-test
+          FILENAME: run-id.txt
+          DOWNLOAD: true
+          AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          REGION: us-east-2
+
+      - name: ls check
+        run: ls ./download/
+      
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: lab-files
+          path: download
+          retention-days: 1
