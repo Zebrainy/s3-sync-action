@@ -1,5 +1,4 @@
-# Upload to Selectel S3 or Download from Selectel S3
-it is not necessary to use the selectel, endpoint can be replaced.
+# Upload to AWS S3 or Download from S3
 
 ## Usage
 
