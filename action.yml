@@ -1,0 +1,75 @@
+name: 'Upload to S3'
+description: ''
+inputs:
+
+  dirname:
+    description: 'folder to upload'
+    required: true
+    default: ''
+     
+  bucketname:
+    description: 'Bucket name'
+    requred: true
+    default: ''
+
+  s3dirname:
+    description: 'folder on S3 to upload to'
+    requred: true
+    default: ''
+        
+  AWS_KEY_ID:
+    required: true
+
+  AWS_ACCESS_KEY:
+    required: true
+
+  REGION:
+    required: false
+    default: ""
+
+  DOWNLOAD:
+    required: false
+    default: "false"
+
+  FILENAME:
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps: 
+    - name: Configure Selectel
+      shell: bash
+      run: |
+        aws configure set aws_access_key_id "${{ inputs.AWS_KEY_ID }}"
+        aws configure set aws_secret_access_key "${{ inputs.AWS_ACCESS_KEY }}" 
+        aws s3 ls || echo "bad data / region"
+      
+    - name: region
+      shell: bash
+      if: inputs.REGION != ''
+      run: aws configure set default.region ${{ inputs.REGION }}
+
+    - name: Sync with AWS (UPLOAD)
+      if: inputs.DOWNLOAD == 'false'
+      shell: bash
+      run: |
+        ([ -d '${{ inputs.dirname }}' ] && aws s3 sync '${{ inputs.dirname }}' 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}') || (echo 'Bad path ${{ inputs.dirname }}')
+
+    - name: Sync with AWS (DOWNLOAD)
+      if: inputs.DOWNLOAD == 'true' && inputs.FILENAME == ''
+      shell: bash
+      run: |
+        aws s3 sync 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}' '${{ inputs.dirname }}'
+
+    - name: Copy from AWS (DOWNLOAD)
+      if: inputs.DOWNLOAD == 'true' && inputs.FILENAME != ''
+      shell: bash
+      run: |
+        aws s3 cp 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}/${{ inputs.FILENAME }}' '${{ inputs.dirname }}/${{ inputs.FILENAME }}'
+    # - name: Print URLs 
+    #   if: inputs.URL-PREFIX != 'None' && inputs.DOWNLOAD == 'false'
+    #   shell: bash
+    #   run: |
+    #     echo ${{ inputs.URL-PREFIX }}${{ inputs.bucketname }}/${{ inputs.s3dirname }}/filename
+    #     echo will be later
