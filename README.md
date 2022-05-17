@@ -7,7 +7,7 @@ if you want to upload files:
 ```yml
         - uses: actions/checkout@v2
           # Make changes here
-        - name: Sync with Seleclel (UPLOAD)
+        - name: Sync with AWS (UPLOAD)
           uses: Zebrainy/s3-sync-action@v1
           with:
             dirname: build/dir
@@ -22,7 +22,7 @@ if you want to download files:
 ```yml
         - uses: actions/checkout@v2
           # Make changes here
-        - name: Sync with Seleclel (DOWNLOAD)
+        - name: Sync with AWS (DOWNLOAD)
           uses: Zebrainy/s3-sync-action@v1
           with:
             dirname: download-dir
@@ -50,6 +50,6 @@ if you want to download a sinlge file:
 | `bucketname` | Bucket/container name. containers | `Yes` | `-` |
 | `AWS_KEY_ID` | AWS id. | `Yes` | `-` |
 | `AWS_ACCESS_KEY` | AWS access key. | `Yes` | `-` |
-| `REGION` | If you need another region. | `No` | `ru-1a` |
+| `REGION` | If you need another region. | `No` | `us-east-2` |
 | `DOWNLOAD` | If want to download a file. (`true`/`false`) | `No` | `false` |
 | `FILENAME` | If want to download a single file. (`filename`) | `No` | `-` |
