@@ -43,13 +43,9 @@ runs:
       run: |
         aws configure set aws_access_key_id "${{ inputs.AWS_KEY_ID }}"
         aws configure set aws_secret_access_key "${{ inputs.AWS_ACCESS_KEY }}" 
+        aws configure set default.region ${{ inputs.REGION }}
         aws s3 ls || (echo "bad aws_access_key_id / aws_secret_access_key" && exit 1 )
       
-    - name: region
-      shell: bash
-      if: inputs.REGION != ''
-      run: aws configure set default.region ${{ inputs.REGION }}
-
     - name: Sync with AWS (UPLOAD)
       if: inputs.DOWNLOAD == 'false'
       shell: bash
@@ -67,9 +63,4 @@ runs:
       shell: bash
       run: |
         aws s3 cp 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}/${{ inputs.FILENAME }}' '${{ inputs.dirname }}/${{ inputs.FILENAME }}'
-    # - name: Print URLs 
-    #   if: inputs.URL-PREFIX != 'None' && inputs.DOWNLOAD == 'false'
-    #   shell: bash
-    #   run: |
-    #     echo ${{ inputs.URL-PREFIX }}${{ inputs.bucketname }}/${{ inputs.s3dirname }}/filename
-    #     echo will be later
+
