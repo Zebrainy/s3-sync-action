@@ -3,8 +3,7 @@ name: Upload TEST Selectel
 on:
   push:
     branches:
-      - main
-      - master
+      - selectel
 
 jobs:
   build:
