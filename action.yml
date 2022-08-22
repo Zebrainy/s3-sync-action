@@ -1,4 +1,4 @@
-name: 'Upload to S3'
+name: 'Upload to S3 - Selectel'
 description: ''
 inputs:
 
@@ -25,7 +25,7 @@ inputs:
 
   REGION:
     required: false
-    default: "us-east-2"
+    default: "ru-1a"
 
   DOWNLOAD:
     required: false
@@ -35,6 +35,10 @@ inputs:
     required: false
     default: ""
 
+  ENDPOINT:
+    required: false
+    default: https://s3.selcdn.ru
+
 runs:
   using: "composite"
   steps: 
@@ -43,24 +47,25 @@ runs:
       run: |
         aws configure set aws_access_key_id "${{ inputs.AWS_KEY_ID }}"
         aws configure set aws_secret_access_key "${{ inputs.AWS_ACCESS_KEY }}" 
+        aws configure set endpoint-url ${{ inputs.ENDPOINT }}
         aws configure set default.region ${{ inputs.REGION }}
-        aws s3 ls || (echo "bad aws_access_key_id / aws_secret_access_key" && exit 1 )
+        aws s3 ls --endpoint https://s3.selcdn.ru/ || (echo "bad aws_access_key_id / aws_secret_access_key" && exit 1 )
       
-    - name: Sync with AWS (UPLOAD)
+    - name: Sync with Selectel  (UPLOAD)
       if: inputs.DOWNLOAD == 'false'
       shell: bash
       run: |
-        ([ -d '${{ inputs.dirname }}' ] && aws s3 sync '${{ inputs.dirname }}' 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}') || (echo 'Bad path ${{ inputs.dirname }}')
+        ([ -d '${{ inputs.dirname }}' ] && aws s3 sync '${{ inputs.dirname }}' 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}' --endpoint ${{ inputs.ENDPOINT }}) || (echo 'Bad path ${{ inputs.dirname }}')
 
-    - name: Sync with AWS (DOWNLOAD)
+    - name: Sync with Selectel  (DOWNLOAD)
       if: inputs.DOWNLOAD == 'true' && inputs.FILENAME == ''
       shell: bash
       run: |
-        aws s3 sync 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}' '${{ inputs.dirname }}'
+        aws s3 sync 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}' '${{ inputs.dirname }}' --endpoint ${{ inputs.ENDPOINT }}
 
-    - name: Copy from AWS (DOWNLOAD)
+    - name: Copy from Selectel  (DOWNLOAD)
       if: inputs.DOWNLOAD == 'true' && inputs.FILENAME != ''
       shell: bash
       run: |
-        aws s3 cp 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}/${{ inputs.FILENAME }}' '${{ inputs.dirname }}/${{ inputs.FILENAME }}'
+        aws s3 cp 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}/${{ inputs.FILENAME }}' '${{ inputs.dirname }}/${{ inputs.FILENAME }}' --endpoint ${{ inputs.ENDPOINT }}
 

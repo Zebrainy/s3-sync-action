@@ -8,7 +8,7 @@ if you want to upload files:
         - uses: actions/checkout@v2
           # Make changes here
         - name: Sync with AWS (UPLOAD)
-          uses: Zebrainy/s3-sync-action@v1
+          uses: Zebrainy/s3-sync-action@selectel
           with:
             dirname: build/dir
             bucketname: my-bucket
@@ -23,7 +23,7 @@ if you want to download files:
         - uses: actions/checkout@v2
           # Make changes here
         - name: Sync with AWS (DOWNLOAD)
-          uses: Zebrainy/s3-sync-action@v1
+          uses: Zebrainy/s3-sync-action@selectel
           with:
             dirname: download-dir
             bucketname: my-bucket
@@ -48,9 +48,9 @@ if you want to download a sinlge file:
 | `dirname` | Folder to upload. | `Yes` | `-` |
 | `s3dirname` | Folder on S3(Simple Storage Service) to upload to. | `Yes` | `-` |
 | `bucketname` | Bucket/container name. containers | `Yes` | `-` |
-| `AWS_KEY_ID` | AWS id. | `Yes` | `-` |
-| `AWS_ACCESS_KEY` | AWS access key. | `Yes` | `-` |
-| `REGION` | If you need another region. | `No` | `us-east-2` |
+| `AWS_KEY_ID` | Selectel id. | `Yes` | `-` |
+| `AWS_ACCESS_KEY` | Selectel access key. | `Yes` | `-` |
+| `REGION` | If you need another region. | `No` | `ru-1a` |
 | `DOWNLOAD` | If want to download a file. (`true`/`false`) | `No` | `false` |
 | `FILENAME` | If want to download a single file. (`filename`) | `No` | `-` |
 
