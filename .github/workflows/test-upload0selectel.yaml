@@ -1,10 +1,48 @@
 name: Upload TEST Selectel
 
 on:
-  push:
-    branches:
-      - selectel
-
+  workflow_dispatch:
+    inputs:
+      key_id_from:
+        description: 'Key id from'     
+        required: true
+        default: 'false'
+      key_secret_from:
+        description: 'Key secret from'     
+        required: true
+        default: 'false'
+      bucket_from:
+        description: 's3 bucket from'     
+        required: true
+        default: 'internal'
+      dir_from:
+        description: 's3 dir from (exmp: testdir/main/yo)'     
+        required: false
+        default: ''  
+      endpoint_from:
+        description: 's3 end from'
+        required: true
+        default: 'https://s3.ru-1.storage.selcloud.ru'
+      key_id_to:
+        description: 'Key id to'     
+        required: true
+        default: 'false'
+      key_secret_to:
+        description: 'Key secret to'     
+        required: true
+        default: 'false'
+      bucket_to:
+        description: 's3 bucket to'     
+        required: true
+        default: 'skazbuka' 
+      endpoint_to:
+        description: 's3 end to'
+        required: true
+        default: 'http://s3.mds.yandex.net'
+      dir_to:
+        description: 's3 dir from (exmp: test/testdir/main/yo)'     
+        required: true
+        default: 'test'  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,41 +51,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       
-      - name: write run-id
-        run: |
-          mkdir lab
-          echo ${{ github.run_id }} >> ./lab/run-id.txt
+      # Download test
+      - name: Sync with AWS (Down)
+        uses: Zebrainy/s3-sync-action@syncer
+        with:
+          dirname: download
+          bucketname: ${{ inputs.bucket_from }}
+          s3dirname: ${{ inputs.dir_from }}
+          DOWNLOAD: true
+          AWS_KEY_ID: ${{ inputs.key_id_from }}
+          AWS_ACCESS_KEY: ${{ inputs.key_secret_from }}
+          ENDPOINT: ${{ inputs.endpoint_from }}
+
+      - name: ls check
+        run: find ./download/
 
       # UPload test
       - name: Sync with AWS (Upload)
-        uses: Zebrainy/s3-sync-action@selectel
-        with:
-          dirname: lab
-          bucketname: internal
-          s3dirname: lab-test
-          AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_SELECTEL }}
-          AWS_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_SELECTEL }}
-          REGION: us-east-2
-
-      # Download test
-      - name: Sync with AWS (Down)
-        uses: Zebrainy/s3-sync-action@selectel
+        uses: Zebrainy/s3-sync-action@syncer
         with:
           dirname: download
-          bucketname: internal
-          s3dirname: lab-test
-          FILENAME: run-id.txt
-          DOWNLOAD: true
-          AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_SELECTEL }}
-          AWS_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_SELECTEL }}
-          REGION: us-east-2
+          bucketname: ${{ inputs.bucket_to }}
+          s3dirname: ${{ inputs.dir_to }}
+          AWS_KEY_ID: ${{ inputs.key_id_to }}
+          AWS_ACCESS_KEY: ${{ inputs.key_secret_to }}
+          ENDPOINT: ${{ inputs.endpoint_to }}
 
-      - name: ls check
-        run: ls ./download/
       
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: lab-files
-          path: download
-          retention-days: 1
