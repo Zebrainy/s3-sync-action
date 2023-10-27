@@ -1,4 +1,4 @@
-name: Upload TEST Selectel
+name: Sync between s3
 
 on:
   workflow_dispatch:
