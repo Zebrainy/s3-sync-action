@@ -1,4 +1,4 @@
-name: 'Upload to S3 - Selectel'
+name: 'Sync between to S3'
 description: ''
 inputs:
 
@@ -48,20 +48,20 @@ runs:
         aws configure set aws_access_key_id "${{ inputs.AWS_KEY_ID }}"
         aws configure set aws_secret_access_key "${{ inputs.AWS_ACCESS_KEY }}" 
         aws configure set endpoint-url ${{ inputs.ENDPOINT }}
-        aws configure set default.region ${{ inputs.REGION }}
-        aws s3 ls --endpoint https://s3.selcdn.ru/ || (echo "bad aws_access_key_id / aws_secret_access_key" && exit 1 )
+        #aws configure set default.region ${{ inputs.REGION }}
+        aws s3 ls --endpoint ${{ inputs.ENDPOINT }} || (echo "bad aws_access_key_id / aws_secret_access_key" && exit 1 )
       
-    - name: Sync with Selectel  (UPLOAD)
+    - name: Sync (UPLOAD)
       if: inputs.DOWNLOAD == 'false'
       shell: bash
       run: |
-        ([ -d '${{ inputs.dirname }}' ] && aws s3 sync '${{ inputs.dirname }}' 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}' --endpoint ${{ inputs.ENDPOINT }}) || (echo 'Bad path ${{ inputs.dirname }}')
+        ([ -d '${{ inputs.dirname }}' ] && aws s3 sync '${{ inputs.dirname }}' 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}' --endpoint ${{ inputs.ENDPOINT }} || (echo 'Bad path ${{ inputs.dirname }}')
 
-    - name: Sync with Selectel  (DOWNLOAD)
+    - name: Sync (DOWNLOAD)
       if: inputs.DOWNLOAD == 'true' && inputs.FILENAME == ''
       shell: bash
       run: |
-        aws s3 sync 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}' '${{ inputs.dirname }}' --endpoint ${{ inputs.ENDPOINT }}
+        aws s3 sync --endpoint ${{ inputs.ENDPOINT }} 's3://${{ inputs.bucketname }}/${{ inputs.s3dirname }}' '${{ inputs.dirname }}'
 
     - name: Copy from Selectel  (DOWNLOAD)
       if: inputs.DOWNLOAD == 'true' && inputs.FILENAME != ''
